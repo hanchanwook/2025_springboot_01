@@ -7,8 +7,6 @@ import com.ict.edu01.members.service.MembersService;
 import com.ict.edu01.members.vo.DataVO;
 import com.ict.edu01.members.vo.MembersVO;
 
-import javax.xml.crypto.Data;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

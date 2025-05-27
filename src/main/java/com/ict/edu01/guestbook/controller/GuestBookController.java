@@ -2,8 +2,6 @@ package com.ict.edu01.guestbook.controller;
 
 import java.util.List;
 
-import javax.xml.crypto.Data;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,10 +28,10 @@ public class GuestBookController {
             List<GuestBookVO> list = guestBookService.guestbooklist();
             if(list == null){
                 dataVO.setSuccess(true);
-                dataVO.setMessage("방명록이 없습니다.");
+                dataVO.setMessage("데이터가 존재하지 않습니다.");
             } else {
                 dataVO.setSuccess(true);
-                dataVO.setMessage("방명록 조회 성공");
+                dataVO.setMessage("데이터가 존재합니다.");
                 dataVO.setData(list);
             }
             } catch (Exception e) {
@@ -46,12 +44,12 @@ public class GuestBookController {
 
     // 이름이 일치하면 생략 가능
     @GetMapping("/guestbookdetail")
-    public DataVO guestbookdetail(@RequestParam("gb_idx") String gb_idx) {
+    public DataVO guestbookdetail(@RequestParam String gb_idx) {
         DataVO dataVO = new DataVO();
         try {
             GuestBookVO gvo = guestBookService.guestbookdetail(gb_idx);
+            // 여러 개 있는 것 중 하나를 선택했는데 없다는 결과는 오류
             if (gvo == null){
-                // 여러 개 있는 것 중 하나를 선택했는데 없다는 결과는 오류
                 dataVO.setSuccess(false);
                 dataVO.setMessage("데이터가 존재하지 않습니다.");
             }else {
@@ -64,10 +62,6 @@ public class GuestBookController {
             dataVO.setSuccess(  false);
             dataVO.setMessage("서버 오류 ");
         }
-
         return dataVO;
-        
     }
-    
-
 }
