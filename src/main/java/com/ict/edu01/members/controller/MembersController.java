@@ -2,11 +2,9 @@ package com.ict.edu01.members.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.ict.edu01.members.service.MembersService;
 import com.ict.edu01.members.vo.DataVO;
 import com.ict.edu01.members.vo.MembersVO;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +28,7 @@ public class MembersController {
     public DataVO getLogin(@RequestBody MembersVO mvo) {
 
         DataVO dataVO = new DataVO();
+
         try {
             // mvo에 담긴 아이디와 비밀번호로 로그인 처리
             // DB에 가서 m_id 와 m_pw가 맞는지 확인한다.
@@ -73,30 +72,23 @@ public class MembersController {
     }
 
     @PostMapping("/register")
-    public String getRegister(@RequestBody MembersVO mvo) {
-        
+    public DataVO getRegister(@RequestBody MembersVO mvo) {
         DataVO dataVO = new DataVO();
-
         try {
             int result = membersService.getRegister(mvo);
             if(result > 0) {
                 dataVO.setSuccess(true); // 회원가입 성공
                 dataVO.setMessage("회원가입 성공");
-            
             } else {
                 dataVO.setSuccess(false); // 회원가입 실패
                 dataVO.setMessage("회원가입 실패: 이미 존재하는 아이디입니다.");
             }
             
-            
         } catch (Exception e) {
             dataVO.setSuccess(false); // 로그인 실패
             dataVO.setMessage("서버 오류: " + e.getMessage());
         }
-       
-       
-       
-        return dataVO.getMessage(); // DataVO 객체 반환
+        return dataVO; // DataVO 객체 반환
     }
 
 }
