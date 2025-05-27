@@ -82,8 +82,8 @@ public class MembersController {
         try {
             int result = membersService.getRegister(mvo);
             if(result > 0) {
-                dataVO.setSuccess(true); // 로그인 성공
-                dataVO.setMessage("로그인 성공");
+                dataVO.setSuccess(true); // 회원가입 성공
+                dataVO.setMessage("회원가입 성공");
             
             } else {
                 dataVO.setSuccess(false); // 회원가입 실패
