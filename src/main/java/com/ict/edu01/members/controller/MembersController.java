@@ -91,5 +91,29 @@ public class MembersController {
         return dataVO; // DataVO 객체 반환
     }
 
+    @PostMapping("/mypage")
+    public DataVO getMyPage(@RequestBody String m_idx) {
+        DataVO dataVO = new DataVO();
+        try {
+            // m_idx에 해당하는 회원 정보를 가져온다.
+            MembersVO mvo = membersService.getMyPage(m_idx);
+            
+            if (mvo == null) {
+                dataVO.setSuccess(false); // 회원 정보 조회 실패
+                dataVO.setMessage("회원 정보 조회 실패: 해당 회원이 존재하지 않습니다.");
+            } else {
+                dataVO.setSuccess(true); // 회원 정보 조회 성공
+                dataVO.setMessage("회원 정보 조회 성공");
+                dataVO.setData(mvo); // 회원 정보 반환
+            }
+            
+        } catch (Exception e) {
+            dataVO.setSuccess(false); // 서버 오류
+            dataVO.setMessage("서버 오류: " + e.getMessage());
+        }
+        
+        return dataVO;
+    }
+    
 }
     

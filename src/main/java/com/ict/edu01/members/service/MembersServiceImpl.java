@@ -27,6 +27,11 @@ public class MembersServiceImpl implements MembersService {
         return memberMapper.getRegister(mvo);
     }
 
+    @Override
+    public MembersVO getMyPage(String m_idx) {
+        return memberMapper.getMyPage(m_idx);
+    }
+
     
 
 
