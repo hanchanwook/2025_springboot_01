@@ -6,7 +6,6 @@ import com.ict.edu01.members.vo.MembersVO;
 
 public interface JwtService {
 
-    Map<String, String> login(MembersVO mvo);
-
-    String getuserIdFromToken(String token);
+    Map<String, String> login(MembersVO mvo);   //  로그인 처리
+    String getuserIdFromToken(String token);    //  토큰에서 사용자 ID 추출
 }

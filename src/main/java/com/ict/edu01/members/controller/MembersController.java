@@ -2,9 +2,14 @@ package com.ict.edu01.members.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ict.edu01.jwt.JwtService;
 import com.ict.edu01.members.service.MembersService;
 import com.ict.edu01.members.vo.DataVO;
 import com.ict.edu01.members.vo.MembersVO;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +24,9 @@ public class MembersController {
     @Autowired
     private MembersService membersService;
 
+    @Autowired
+    private JwtService jwtService;
+
     @GetMapping("/hello")
     public String getHello() {
         return "Hello, SpringBoot!";
@@ -32,7 +40,6 @@ public class MembersController {
         try {
             // mvo에 담긴 아이디와 비밀번호로 로그인 처리
             // DB에 가서 m_id 와 m_pw가 맞는지 확인한다.
-            MembersVO membersVO = membersService.getLogin(mvo);
             
             // membersVO가 null이면 로그인 실패            
             // DataVO dataVO = new DataVO();
@@ -51,17 +58,27 @@ public class MembersController {
             // 맞지 않으면
             // dataVO.setSuccess(false); // 실패
             // dataVO.setMessage("로그인 실패"); // 실패 메시지
-
+            /* 
+            MembersVO membersVO = membersService.getLogin(mvo);
             if (membersVO == null) {
                 dataVO.setSuccess(false); // 로그인 실패
                 dataVO.setMessage("로그인 실패: 아이디 또는 비밀번호가 잘못되었습니다.");
             } else {
+                // 로그인 성공 시 toeken 생성 로직 추가
                 dataVO.setSuccess(true); // 로그인 성공
                 dataVO.setMessage("로그인 성공");
                 dataVO.setData(membersVO); // 로그인한 회원 정보 반환
             }
+            */
 
-            
+        // jwt를 활용한 로그인 처리
+        Map<String, String> toekens = jwtService.login(mvo);
+            dataVO.setSuccess(true);
+            dataVO.setData(toekens); // 로그인 성공 시 토큰 정보 반환
+            dataVO.setMessage("로그인 성공");
+
+
+
         } catch (Exception e) {
             // 예외 발생 시 에러 메시지 반환
             dataVO.setSuccess(false); // 로그인 실패
