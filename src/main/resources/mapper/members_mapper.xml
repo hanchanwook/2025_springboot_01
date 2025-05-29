@@ -25,4 +25,14 @@
     <select id="findUserById" parameterType="String" resultType="MembersVO">
         SELECT * FROM members WHERE m_id = #{m_id}
     </select>
+
+    <!-- ON DUPLICATE KEY UPDATE => 키(Primary Key)가 중복이면 수정, 없으면 추가 -->
+    <insert id="saveRefreshToken" parameterType="RefreshVO">
+        INSERT INTO refresh_token(m_id, refresh_token, expiry_date)
+        VALUES(#{m_id}, #{refresh_token}, #{expiry_date})
+        ON DUPLICATE KEY UPDATE 
+        refresh_token = #{refresh_token},
+        expiry_date = #{expiry_date}
+    </insert>
+
 </mapper>

@@ -39,25 +39,24 @@ public class JwtRequestFilter extends OncePerRequestFilter{
         // 들어오는 HTTP 요청마다 Authorization 이 있고 Authorization 는 JWT 검증하기 위해서 토큰을 추출
         final String authorizationHeader = request.getHeader("Authorization");
         String userId = null;
-        String jwtToken1 = null;
-        String jwtToken2 = null;
+        String jwtToken = null;
 
         // Authorization 헤더가 존재하고 "Bearer "로 시작하는지 확인
         // Bearer는 JWT 토큰의 표준 인증 방식
         if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
             // "Bearer " 접두사를 제거하고 실제 토큰 값만 추출
-            jwtToken1 = authorizationHeader.substring(7);
-            jwtToken2 = authorizationHeader.toString();
+            jwtToken = authorizationHeader.toString();
+           
             
             try {
-                log.info("jwtToken : " + jwtToken1);
+                log.info("jwtToken : " + jwtToken);
                 //  토큰 만료 검사
-                if(jwtUtil.isTokenExpired(jwtToken1)){
+                if(jwtUtil.isTokenExpired(jwtToken)){
                     log.info("token expire error");
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"token expire error");
                     return ;
                 }
-                userId = jwtUtil.validateAndExtractUserId(jwtToken2);
+                userId = jwtUtil.validateAndExtractUserId(jwtToken);
 
             } catch (Exception e) {
                 log.info("token error");
@@ -76,7 +75,7 @@ public class JwtRequestFilter extends OncePerRequestFilter{
             UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
 
             // JWT 검증 및 SpringSecurity 인증객체에 사용자 정보를 등록
-            if(jwtUtil.validateToken(jwtToken2, userDetails)){
+            if(jwtUtil.validateToken(jwtToken, userDetails)){
                 // SpringSecurity 표준 인증 객체 (인증 주체, 자격증명(null=jwt), 권한정보(ROLE))
                 UsernamePasswordAuthenticationToken authToken = 
                 new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());

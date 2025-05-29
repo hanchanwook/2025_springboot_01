@@ -155,10 +155,10 @@ public class JwtUtil {
     public boolean validateToken(String jwtToken, UserDetails userDetails){
         try {
             validateAndExtractUserId(jwtToken);
-            return true;
         } catch (Exception e) {
             return false;
         }
+        return true;
     }
 
 }
