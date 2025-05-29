@@ -18,8 +18,11 @@
 
     <!-- 나의 정보 -->
     <!-- m_idx로 회원 정보를 조회 --> 
-     <select id="getMyPage" resultType="MembersVO" parameterType="String">
+     <select id="getMyPage" parameterType="String" resultType="MembersVO">
         SELECT * FROM members WHERE m_idx=#{m_idx}
      </select>
 
+    <select id="findUserById" parameterType="String" resultType="MembersVO">
+        SELECT * FROM members WHERE m_id = #{m_id}
+    </select>
 </mapper>

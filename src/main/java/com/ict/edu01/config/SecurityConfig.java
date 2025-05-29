@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.ict.edu01.jwt.JwtRequestFilter;
 import com.ict.edu01.jwt.JwtUtil;
 import com.ict.edu01.members.service.MembersService;
+import com.ict.edu01.members.service.MyUserDetailService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,7 +48,29 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                             log.info("securityFilterChain 호출");
+        http 
+        // CORS 설정
+        // ( a -> b : a를 받아서 b를 실행하라 (람다식 표현))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+       
+        // CSRF 보호 비활성화 (JWT 사용시 일반적으로 비활성화)
+        // CSRF란? - 사용자가 로그인 된 상태를 악용하여, 악의적인 사이트가 사용자의 권한으로 요청을 보내도록 만드는 공격
+        // JWT는 세션을 사용하지 않고, Authorization 헤더로 인증(CSRF의 위험이 없음)
+        .csrf(csrf -> csrf.disable())
+       
+        // 요청별 권한 설정
+        .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers("/api/members/login").permitAll()      // 허용하는 url만 작성(로그인), permitAll() : 허용하다.
+            .requestMatchers("/api/members/register").permitAll()   // (회원 가입)
+            .anyRequest().authenticated())
 
+        // oauth2Login 설정     -  소셜 로그인 규격
+
+        //  사용자 요청이 오면 먼저 jwtRequestFilter가 실행되어, JWT 토큰을 검증 한 후
+        //  이상이 없으면 SpringSecurity의 인증된 사용자로 처리된다.
+        .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     @Bean
@@ -69,7 +93,7 @@ public class SecurityConfig {
 
     CorsConfiguration corsConfig = new CorsConfiguration();
         // 허용할 Origin 설정, 메서드, 헤더, 인증 정보
-        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://studyjava.shop"));  // 배열을 받아서 리스트로 한다.
+        corsConfig.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://studyjava.shop","http://43.203.201.193"));  // 배열을 받아서 리스트로 한다.
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(Arrays.asList("*"));
         corsConfig.setAllowCredentials(true);

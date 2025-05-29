@@ -11,4 +11,6 @@ public interface MembersMapper {
     int getRegister(MembersVO mvo);
     MembersVO getMyPage(String m_idx);
 
+    MembersVO findUserById(String m_id);
+    
 } 
