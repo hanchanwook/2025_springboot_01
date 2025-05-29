@@ -8,12 +8,13 @@ import com.ict.edu01.members.vo.RefreshVO;
 @Mapper
 public interface MembersMapper {
     
-    MembersVO getLogin(MembersVO mvo);
+    MembersVO getLogin(MembersVO mvo);   //  로그인
     
-    int getRegister(MembersVO mvo);
-    MembersVO getMyPage(String m_idx);
+    int getRegister(MembersVO mvo);   //  회원가입
+    
+    MembersVO getMyPage(String m_idx);   //  나의 정보 조회
 
-    MembersVO findUserById(String m_id) ;
+    MembersVO findUserById(String m_id) ;   //  아이디 조회
 
-    void saveRefreshToken(RefreshVO refreshVO);
+    void saveRefreshToken(RefreshVO refreshVO);   //  리프레시 토큰 저장
 }

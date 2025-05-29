@@ -145,13 +145,32 @@ public class JwtUtil {
 
     //  받은 토큰을 이용해서 모든 정보 반환
     public Claims extractAllClaims(String token){
-        return Jwts.parserBuilder()
-        .setSigningKey(secretKey)
-        .build()
-        .parseClaimsJws(token)
-        .getBody();
+        return Jwts.parserBuilder() // JWT parser의 빌더 객체 생성
+        .setSigningKey(secretKey)   // 서명 키 설정
+        .build()                    // 설정이 완료 된 parser 객체 생성
+        .parseClaimsJws(token)      // JWT 토큰 파싱
+        .getBody();                 // 파싱된 클레임 정보 반환환
     }
 
+    /* 
+    파싱(parsing)
+     복잡한 데이터 구조나 문자열을 분석하여 의미 있는 정보로 분해하는 과정
+     예시)
+     JWT토큰 - (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c)
+     헤더(Header) : 토큰의 타입과 서명 알고리즘
+     페이로드(Payload) : 실제 데이터 (사용자ID, 만료 시간 등) 
+     서명(Signature) : 토큰의 무결성 검증을 위한 문자열
+     파싱 과정에서는 이 세 부분을 각각 분리하고 검증하여 최종적으로 페이로드에서 사용자 정보를 추출
+
+    파서(parser)
+     파싱을 수행하는 도구나 프로그램
+     JWT 의 경우 jwts.parserBuilder() 가 파서를 생성하는 메서드
+     이 파서는 JWT 토큰을 분석하여 그 안에 담긴 정보를 추출하는 역할 
+    */
+
+
+
+    //  토큰 유효성 검사
     public boolean validateToken(String jwtToken, UserDetails userDetails){
         try {
             validateAndExtractUserId(jwtToken);

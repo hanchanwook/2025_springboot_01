@@ -3,7 +3,6 @@ package com.ict.edu01.members.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ict.edu01.jwt.JwtService;
 import com.ict.edu01.jwt.JwtUtil;
 import com.ict.edu01.members.service.MembersService;
 import com.ict.edu01.members.service.MyUserDetailService;
@@ -17,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
+// 비밀 키 선언
+    // JWT 토큰을 서명(sign)하고 검증(verify)하는데 사용되는 비밀 키입니다.
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -42,7 +43,7 @@ public class MembersController {
         return "Hello, SpringBoot!";
     }
 
-    @PostMapping("/login")
+    @PostMapping("/login")  // 로그인 처리
     public DataVO getLogin(@RequestBody MembersVO mvo) {
 
         DataVO dataVO = new DataVO();
@@ -81,25 +82,29 @@ public class MembersController {
             }
             */
             // jwt를 활용한 로그인 처리 (암호화 해서 없어진다.)
-            
-            
-            
-            UserDetails userDetails = userDetailService.loadUserByUsername(mvo.getM_id());
-            if(passwordEncoder.matches(mvo.getM_pw(), userDetails.getPassword())){
+         
+            UserDetails userDetails = userDetailService.loadUserByUsername(mvo.getM_id());  // 입력된 ID를 가지고 유저 정보를 가져 온다.
+            //  입력된 비밀번호와 유저 정보 일치/불일치 확인        
+            if (passwordEncoder.matches(mvo.getM_pw(), userDetails.getPassword())) {
                 return new DataVO(false, "비밀번호 불일치", null );
-            }    // 비밀번호 맞으면 id 가지고, accesstoken, refreshToken 생성
+                }    // 비밀번호 맞으면 id 가지고, accesstoken, refreshToken 생성
+            
+            //  ID를 가지고 accessToken, refreshToken 생성    
             String accessToken = jwtUtil.gererateAccessToken(mvo.getM_id());
             String refreshToken = jwtUtil.gererateRefreshToken(mvo.getM_id());
             
+            //  회원 id에 해당하는 refreshToken 과 만료 시간을 저장
             membersService.saveRefreshToken(mvo.getM_id(), refreshToken, jwtUtil.extractExpiration(refreshToken));
 
+            // 토큰 정보를 담아서 HashMap 생성 및 반환
             Map<String, String> tokens = new HashMap<>();
             tokens.put("accessToken", accessToken);
             tokens.put("refreshToken", refreshToken);
-
-            dataVO.setSuccess(true);
-            dataVO.setData(tokens);
-            dataVO.setMessage("로그인 성공");
+            
+            // 성공 시 데이터 반환
+            dataVO.setSuccess(true);    // 성공
+            dataVO.setData(tokens);    // 토큰 정보
+            dataVO.setMessage("로그인 성공"); // 성공 메시지
 
 
 
@@ -113,7 +118,7 @@ public class MembersController {
     }
 
     @PostMapping("/register")
-    public DataVO getRegister(@RequestBody MembersVO mvo) {
+    public DataVO getRegister(@RequestBody MembersVO mvo) {    //  회원가입
         DataVO dataVO = new DataVO();
         try {
             // 비밀번호 암호화
@@ -136,7 +141,7 @@ public class MembersController {
     }
 
     @PostMapping("/mypage")
-    public DataVO getMyPage(@RequestBody String m_idx) {
+    public DataVO getMyPage(@RequestBody String m_idx) {    //  나의 정보 조회
         DataVO dataVO = new DataVO();
         try {
             // m_idx에 해당하는 회원 정보를 가져온다.

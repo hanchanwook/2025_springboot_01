@@ -15,7 +15,7 @@ public class JwtConfig {
     private long refreshTokenValidity ;
 
     @Bean
-    public JwtUtil jwtUtil() {
+    public JwtUtil jwtUtil() {   //  JWT 토큰 생성 및 검증을 위한 유틸리티
         return new JwtUtil(secret, accessTokenValidity, refreshTokenValidity);
     }
 

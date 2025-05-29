@@ -18,7 +18,7 @@ public class MembersServiceImpl implements MembersService {
     private MembersMapper membersMapper;
 
     @Override
-    public MembersVO getLogin(MembersVO mvo) {
+    public MembersVO getLogin(MembersVO mvo) {   //  로그인
         // DB에서 mvo에 해당하는 회원 정보를 조회한다.
         // return memberMapper.getLogin(mvo);    
         // 임시로 null을 반환 (실제 DB 연동 시에는 위의 주석을 해제하고 사용)
@@ -26,21 +26,18 @@ public class MembersServiceImpl implements MembersService {
     }
 
     @Override
-    public int getRegister(MembersVO mvo) {
+    public int getRegister(MembersVO mvo) {   //  회원가입
         return membersMapper.getRegister(mvo);
     }
 
     @Override
-    public MembersVO getMyPage(String m_idx) {
+    public MembersVO getMyPage(String m_idx) {   //  나의 정보 조회
         return membersMapper.getMyPage(m_idx);
     }
 
     @Override
-    public void saveRefreshToken(String m_id, String refreshToken, Date expiry_date) {
+    public void saveRefreshToken(String m_id, String refreshToken, Date expiry_date) {   //  리프레시 토큰 저장
         membersMapper.saveRefreshToken(new RefreshVO(m_id, refreshToken, expiry_date));
         }
-
-    
-
 
 }

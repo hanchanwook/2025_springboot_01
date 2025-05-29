@@ -26,10 +26,12 @@ public class JwtServiceImpl implements JwtService {
         // 사용자 확인
         MembersVO user = membersService.getLogin(mvo);
         System.out.println("user_id: " + user.getM_id());
-
+        
+        /*
         if(user == null){
             throw new IllegalArgumentException("Invalid Token");
         }
+        */
         
         // springSecurity
 
