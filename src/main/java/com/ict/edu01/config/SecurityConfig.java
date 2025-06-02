@@ -146,6 +146,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/api/members/login").permitAll()      // 허용하는 url만 작성(로그인), permitAll() : 허용하다.
             .requestMatchers("/api/members/register").permitAll()   // (회원 가입)
+            .requestMatchers("/api/members/refresh").permitAll()    
             .anyRequest().authenticated())
 
         // oauth2Login 설정     -  소셜 로그인 규격 추후 추가 예정정

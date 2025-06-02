@@ -35,4 +35,8 @@
         expiry_date = #{expiry_date}
     </insert>
 
+    <select id="getRefreshToken" parameterType="String" resultType="RefreshVO">
+        SELECT * FROM refresh_token WHERE m_id = #{m_id}
+    </select>
+
 </mapper>

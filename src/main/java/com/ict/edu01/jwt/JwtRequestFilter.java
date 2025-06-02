@@ -36,6 +36,13 @@ public class JwtRequestFilter extends OncePerRequestFilter{
 
         log.info("JwtRequestFilter Call ok");
 
+        // 토큰 검사 예외 처리 : refresh 요청 통과
+        String path = request.getRequestURI();
+        if("api/member/refresh".equals(path)){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 들어오는 HTTP 요청마다 Authorization 이 있고 Authorization 는 JWT 검증하기 위해서 토큰을 추출
         final String authorizationHeader = request.getHeader("Authorization");
         String userId = null;
@@ -45,25 +52,29 @@ public class JwtRequestFilter extends OncePerRequestFilter{
         // Bearer는 JWT 토큰의 표준 인증 방식
         if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
             // "Bearer " 접두사를 제거하고 실제 토큰 값만 추출
-            jwtToken = authorizationHeader.toString();
+            jwtToken = authorizationHeader.substring(7);
            
-            
             try {
                 log.info("jwtToken : " + jwtToken);
                 //  토큰 만료 검사
                 if(jwtUtil.isTokenExpired(jwtToken)){
                     log.info("token expire error");
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"token expire error");
-                    return ;
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write("{\"success\":false, \"message\":\"token expired\"}");
+                    return;
                 }
                 userId = jwtUtil.validateAndExtractUserId(jwtToken);
-
+                log.info("userId : " + userId);
+                
             } catch (Exception e) {
                 log.info("token error");
                 // 토큰 처리 중 오류 발생 시 401 Unauthorized 응답
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "token error");
-            }
-
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json; charset=UTF-8");
+                    response.getWriter().write("{\"success\":false, \"message\":\"token expired\"}");
+                    return;            
+                }
         } else {
             log.info("Authorization empty Bearer token empty ");
         }

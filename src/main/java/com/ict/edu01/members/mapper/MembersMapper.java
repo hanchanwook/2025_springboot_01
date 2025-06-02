@@ -12,9 +12,11 @@ public interface MembersMapper {
     
     int getRegister(MembersVO mvo);   //  회원가입
     
-    MembersVO getMyPage(String m_idx);   //  나의 정보 조회
+    MembersVO getMyPage(String m_id);   //  나의 정보 조회
 
     MembersVO findUserById(String m_id) ;   //  아이디 조회
 
     void saveRefreshToken(RefreshVO refreshVO);   //  리프레시 토큰 저장
+
+    RefreshVO getRefreshToken(String m_id);
 }

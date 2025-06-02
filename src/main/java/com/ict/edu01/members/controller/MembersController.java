@@ -8,6 +8,9 @@ import com.ict.edu01.members.service.MembersService;
 import com.ict.edu01.members.service.MyUserDetailService;
 import com.ict.edu01.members.vo.DataVO;
 import com.ict.edu01.members.vo.MembersVO;
+import com.ict.edu01.members.vo.RefreshVO;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -85,7 +88,7 @@ public class MembersController {
          
             UserDetails userDetails = userDetailService.loadUserByUsername(mvo.getM_id());  // 입력된 ID를 가지고 유저 정보를 가져 온다.
             //  입력된 비밀번호와 유저 정보 일치/불일치 확인        
-            if (passwordEncoder.matches(mvo.getM_pw(), userDetails.getPassword())) {
+            if (! passwordEncoder.matches(mvo.getM_pw(), userDetails.getPassword())) {
                 return new DataVO(false, "비밀번호 불일치", null );
                 }    // 비밀번호 맞으면 id 가지고, accesstoken, refreshToken 생성
             
@@ -103,10 +106,8 @@ public class MembersController {
             
             // 성공 시 데이터 반환
             dataVO.setSuccess(true);    // 성공
-            dataVO.setData(tokens);    // 토큰 정보
+            dataVO.setData(tokens);             // 토큰 정보
             dataVO.setMessage("로그인 성공"); // 성공 메시지
-
-
 
         } catch (Exception e) {
             // 예외 발생 시 에러 메시지 반환
@@ -140,12 +141,13 @@ public class MembersController {
         return dataVO; // DataVO 객체 반환
     }
 
-    @PostMapping("/mypage")
-    public DataVO getMyPage(@RequestBody String m_idx) {    //  나의 정보 조회
+    @GetMapping("/mypage")
+    public DataVO getMyPage(HttpServletRequest request) {    //  나의 정보 조회
         DataVO dataVO = new DataVO();
         try {
-            // m_idx에 해당하는 회원 정보를 가져온다.
-            MembersVO mvo = membersService.getMyPage(m_idx);
+            String token = request.getHeader("Authorization").replace("Bearer ", "");
+            String m_id = jwtUtil.validateAndExtractUserId(token);
+            MembersVO mvo = membersService.getMyPage(m_id);
             
             if (mvo == null) {
                 dataVO.setSuccess(false); // 회원 정보 조회 실패
@@ -155,14 +157,48 @@ public class MembersController {
                 dataVO.setMessage("회원 정보 조회 성공");
                 dataVO.setData(mvo); // 회원 정보 반환
             }
-            
         } catch (Exception e) {
             dataVO.setSuccess(false); // 서버 오류
             dataVO.setMessage("서버 오류: " + e.getMessage());
         }
-        
         return dataVO;
     }
+
+    @PostMapping("/refresh")
+    public DataVO getRefresh(@RequestBody Map<String, String> map) {
+        try {
+    //        log.info("refresh 들어왓네요");
+            String refreshToken = map.get("refreshToken");
+            String m_id = jwtUtil.validateAndExtractUserId(refreshToken);
+            //  DB에 m_id 가지고 refresh token 을 확인(체크)
+            RefreshVO refreshVO = membersService.getRefreshToken(m_id); 
+            //  DB의 refreshToken과 유저가 보낸 refreshToken이 같아야 accessToken 발급
+            if(refreshVO == null || refreshToken.equals((refreshVO.getRefresh_token()))){
+                return new DataVO(false, "refreshToken 불일치", null);
+            }
+            //  새로운 accessToken, refreshToken 발급
+            String newAccessToken = jwtUtil.gererateAccessToken(m_id);
+            String newRefreshToken = jwtUtil.gererateRefreshToken(m_id);
+
+            //  newRefreshToken을 DB에 갱신하자, 만기
+            membersService.saveRefreshToken(m_id, newRefreshToken, jwtUtil.extractExpiration(newRefreshToken));
+            /* 
+            Map<String, String> map2 = new HashMap<>();
+            map2.put("accessToken", newAccessToken);
+            map2.put("refreshToken", newRefreshToken);
+            return new DataVO(true, "재발급 성공",  map2);
+            */
+
+            return new DataVO(true, "재발급 성공", Map.of(
+                "accessToken", newAccessToken,
+                "refreshToken", newRefreshToken
+            ));
+        } catch (Exception e) {
+            return new DataVO(false, "재발급 실패", null);
+        }
+        
+    }
+    
     
 }
     
