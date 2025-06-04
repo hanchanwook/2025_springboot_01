@@ -11,6 +11,7 @@ import com.ict.edu01.members.vo.MembersVO;
 import com.ict.edu01.members.vo.RefreshVO;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
+@Slf4j 
 @RestController
 @RequestMapping("/api/members")
 public class MembersController {
@@ -167,15 +168,25 @@ public class MembersController {
     @PostMapping("/refresh")
     public DataVO getRefresh(@RequestBody Map<String, String> map) {
         try {
-    //        log.info("refresh 들어왓네요");
+            //  log.info("refresh 들어왓네요");
             String refreshToken = map.get("refreshToken");
+            
+            //  1. 만료 여부 검사
+            if(jwtUtil.isTokenExpired(refreshToken)){
+                return new DataVO(false, "refreshToken 만료", null);
+            }
+
+            //  2. 사용자 ID 추출
             String m_id = jwtUtil.validateAndExtractUserId(refreshToken);
+
             //  DB에 m_id 가지고 refresh token 을 확인(체크)
             RefreshVO refreshVO = membersService.getRefreshToken(m_id); 
+
             //  DB의 refreshToken과 유저가 보낸 refreshToken이 같아야 accessToken 발급
             if(refreshVO == null || refreshToken.equals((refreshVO.getRefresh_token()))){
                 return new DataVO(false, "refreshToken 불일치", null);
             }
+
             //  새로운 accessToken, refreshToken 발급
             String newAccessToken = jwtUtil.gererateAccessToken(m_id);
             String newRefreshToken = jwtUtil.gererateRefreshToken(m_id);
@@ -188,7 +199,7 @@ public class MembersController {
             map2.put("refreshToken", newRefreshToken);
             return new DataVO(true, "재발급 성공",  map2);
             */
-
+            //  위의 주석과 같음
             return new DataVO(true, "재발급 성공", Map.of(
                 "accessToken", newAccessToken,
                 "refreshToken", newRefreshToken

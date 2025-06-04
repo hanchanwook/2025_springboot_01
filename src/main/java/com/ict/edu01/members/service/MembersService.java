@@ -14,6 +14,8 @@ public interface MembersService {
 
     void saveRefreshToken(String m_id, String refreshToken, Date expiry_date);   //  리프레시 토큰 저장
  
-    RefreshVO getRefreshToken(String m_id);
+    RefreshVO getRefreshToken(String m_id);     // 새 토큰 발급
+
+    void getRegister2(MembersVO mvo);
 
 }

@@ -16,6 +16,12 @@
         VALUES(#{m_id}, #{m_pw}, #{m_name}, #{m_email}, #{m_addr}, #{m_addr2}, #{m_phone})
     </insert>    
 
+    <insert id="getRegister2" parameterType="MembersVO">
+        INSERT INTO members (m_id, m_name, sns_email_kakao, sns_provider )
+        VALUES(#{m_id}, #{m_name}, #{sns_email_kakao}, #{sns_provider} )
+    </insert>    
+
+
     <!-- 나의 정보 -->
     <!-- m_idx로 회원 정보를 조회 --> 
      <select id="getMyPage" parameterType="String" resultType="MembersVO">

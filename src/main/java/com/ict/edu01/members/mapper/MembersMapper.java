@@ -19,4 +19,6 @@ public interface MembersMapper {
     void saveRefreshToken(RefreshVO refreshVO);   //  리프레시 토큰 저장
 
     RefreshVO getRefreshToken(String m_id);
+
+    void getRegister2(MembersVO mvo);
 }
