@@ -27,7 +27,7 @@ spring:
         name: edu01
 
     datasource:
-        url: jdbc:mysql://localhost:3306/ictedu_db
+        url: jdbc:mysql://43.201.115.243:3306/ictedu_db
         username: ictedu
         password: 1111
         driver-class-name: com.mysql.cj.jdbc.Driver
@@ -38,12 +38,11 @@ spring:
                 registration:
                     kakao:
                         client-id: 6e4ca1ddb62283c869fb9a3e27ac26ee
-                        client-secret: x3VKvdFM52f8esUJKwiDZEM8goEkCBqH
-                        redirect-uri: http://localhost:8080/kakaologin
+                        client-secret: UhX4MN1k2EYlgaMbMPzDJLxLTEAxkiKt
+                        redirect-uri: http://localhost:8080/login/oauth2/code/kakao
                         authorization-grant-type: authorization_code
-                        client-authentication-method: client-secret_post
+                        client-authentication-method: client_secret_post
                         client-name: Kakao
-                        # scope : [profile_nickname, profile_image, account_email] 와 같은 배열의 의미    
                         scope:
                             - profile_nickname
                             - profile_image
@@ -58,12 +57,11 @@ spring:
                             - name
                             - email
                 provider:
-                    Kakao: 
+                    kakao:
                         authorization-uri: https://kauth.kakao.com/oauth/authorize
                         token-uri: https://kauth.kakao.com/oauth/token
                         user-info-uri: https://kapi.kakao.com/v2/user/me
                         user-name-attribute: id
-
                     naver:
                         authorization-uri: https://nid.naver.com/oauth2.0/authorize
                         token-uri: https://nid.naver.com/oauth2.0/token
@@ -81,3 +79,8 @@ server:
 mybatis:
     mapper-locations: mapper/*.xml
     type-aliases-package: com.ict.edu01
+
+jwt:
+    secret: mysecretmysecretmysecretmysecret
+    access-token-validity: 900000
+    refresh-token-validity: 604800000

@@ -21,7 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 // 비밀 키 선언
-    // JWT 토큰을 서명(sign)하고 검증(verify)하는데 사용되는 비밀 키입니다.
+// JWT 토큰을 서명(sign)하고 검증(verify)하는데 사용되는 비밀 키입니다.
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -86,16 +86,18 @@ public class MembersController {
             }
             */
             // jwt를 활용한 로그인 처리 (암호화 해서 없어진다.)
-         
+            log.info(mvo.getM_id()+","+mvo.getM_pw());
             UserDetails userDetails = userDetailService.loadUserByUsername(mvo.getM_id());  // 입력된 ID를 가지고 유저 정보를 가져 온다.
+            log.info(userDetails+"");
             //  입력된 비밀번호와 유저 정보 일치/불일치 확인        
             if (! passwordEncoder.matches(mvo.getM_pw(), userDetails.getPassword())) {
+                log.info("비번 틀림");
                 return new DataVO(false, "비밀번호 불일치", null );
                 }    // 비밀번호 맞으면 id 가지고, accesstoken, refreshToken 생성
-            
+                log.info("비번 맞음");
             //  ID를 가지고 accessToken, refreshToken 생성    
-            String accessToken = jwtUtil.gererateAccessToken(mvo.getM_id());
-            String refreshToken = jwtUtil.gererateRefreshToken(mvo.getM_id());
+            String accessToken = jwtUtil.gerenateAccessToken(mvo.getM_id());
+            String refreshToken = jwtUtil.gerenateRefreshToken(mvo.getM_id());
             
             //  회원 id에 해당하는 refreshToken 과 만료 시간을 저장
             membersService.saveRefreshToken(mvo.getM_id(), refreshToken, jwtUtil.extractExpiration(refreshToken));
@@ -188,8 +190,8 @@ public class MembersController {
             }
 
             //  새로운 accessToken, refreshToken 발급
-            String newAccessToken = jwtUtil.gererateAccessToken(m_id);
-            String newRefreshToken = jwtUtil.gererateRefreshToken(m_id);
+            String newAccessToken = jwtUtil.gerenateAccessToken(m_id);
+            String newRefreshToken = jwtUtil.gerenateRefreshToken(m_id);
 
             //  newRefreshToken을 DB에 갱신하자, 만기
             membersService.saveRefreshToken(m_id, newRefreshToken, jwtUtil.extractExpiration(newRefreshToken));

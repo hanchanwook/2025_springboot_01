@@ -72,7 +72,7 @@ public class JwtUtil {
     }
 
     // Access Token 생성 메소드
-    public String gererateAccessToken(String userId) {
+    public String gerenateAccessToken(String userId) {
         return Jwts.builder()                           // jwt 토큰을 생성하기 위한 빌더 패턴 시작, 토큰의 각 부분을 설정할 수 있음.
                 .setSubject(userId)                     // 토큰의 주체(사용자ID)를 설정
                 .setIssuedAt(new Date())                // 토큰이 발급된 시간을 현재 시간으로 설정
@@ -95,7 +95,7 @@ public class JwtUtil {
     */    
 
     // Refresh Token 생성 메소드
-    public String gererateRefreshToken(String userId) {
+    public String gerenateRefreshToken(String userId) {
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuedAt(new Date())
@@ -121,15 +121,18 @@ public class JwtUtil {
             // Bearer 는 HTTP Authorization 헤더를 통해 토큰 전달 방식
             // Bearer 의미는 "이 토큰 소지한 자는 인증된 것으로 간주한다." 를 의미
             // Authorization: Bearer token
-            token = token.substring(7);     // token 값만 가져오기, 보통은 'Bearer '와 함께 사용하기에 substring(7)으로 실제 토큰 값만 추출 
-            Claims ckaims = Jwts.parserBuilder()       
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);     // token 값만 가져오기
+            }
+            
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)          // 토큰 서명을 검증할 키 설정 
                     .build()                           // JWT 파서 생성
                     .parseClaimsJws(token)             // 토큰을 파싱하고 서명 검증
                     .getBody();                        // 검증된 토큰의 내용 추출
-            return ckaims.getSubject();                // 사용자 ID 반환
+            return claims.getSubject();                // 사용자 ID 반환
         } catch (JwtException | IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid Token");
+            throw new IllegalArgumentException("Invalid Token: " + e.getMessage());
         }
     }
 

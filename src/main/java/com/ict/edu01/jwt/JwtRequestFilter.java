@@ -68,13 +68,12 @@ public class JwtRequestFilter extends OncePerRequestFilter{
                 log.info("userId : " + userId);
                 
             } catch (Exception e) {
-                log.info("token error");
-                // 토큰 처리 중 오류 발생 시 401 Unauthorized 응답
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json; charset=UTF-8");
-                    response.getWriter().write("{\"success\":false, \"message\":\"token expired\"}");
-                    return;            
-                }
+                log.error("Token validation error: ", e);  // 상세 에러 로깅 추가
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json; charset=UTF-8");
+                response.getWriter().write("{\"success\":false, \"message\":\"Invalid token: " + e.getMessage() + "\"}");
+                return;            
+            }
         } else {
             log.info("Authorization empty Bearer token empty ");
         }

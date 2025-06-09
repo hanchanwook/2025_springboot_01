@@ -38,7 +38,7 @@ public class JwtServiceImpl implements JwtService {
         // Refresh Token 처리
 
         // Access Token 생성
-        String accessToken = jwtUtil.gererateAccessToken(user.getM_id());
+        String accessToken = jwtUtil.gerenateAccessToken(user.getM_id());
 
         // 결과 저장
         Map<String, String> tokens = new HashMap<>();
