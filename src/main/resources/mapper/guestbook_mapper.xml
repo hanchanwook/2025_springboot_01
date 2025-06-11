@@ -12,6 +12,11 @@
         SELECT * FROM guestbook WHERE gb_idx = #{gb_idx} 
 
     </select>
+
+    <insert id="guestbookwrite" parameterType="GuestBookVO">
+        INSERT INTO guestbook (gb_name, gb_email, gb_subject, gb_content,gb_f_name)
+        VALUES (#{gb_name}, #{gb_email}, #{gb_subject}, #{gb_content}, #{gb_f_name})
+    </insert>
    
 
 </mapper>

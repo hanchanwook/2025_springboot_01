@@ -8,5 +8,7 @@ public interface GuestBookService {
 
     List<GuestBookVO> guestbooklist();
 
-    GuestBookVO guestbookdetail(String gb_idx);  
+    GuestBookVO guestbookdetail(String gb_idx); 
+    
+    int guestbookwrite(GuestBookVO gVO);    
 } 

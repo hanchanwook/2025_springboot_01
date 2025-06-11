@@ -34,10 +34,11 @@ public class JwtRequestFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
              FilterChain filterChain) throws ServletException, IOException {
 
-        log.info("JwtRequestFilter Call ok");
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+        log.info("Request received - Method: {}, Path: {}", method, path);
 
         // 토큰 검사 예외 처리 : refresh 요청 통과
-        String path = request.getRequestURI();
         if("api/member/refresh".equals(path)){
             filterChain.doFilter(request, response);
             return;
@@ -55,27 +56,27 @@ public class JwtRequestFilter extends OncePerRequestFilter{
             jwtToken = authorizationHeader.substring(7);
            
             try {
-                log.info("jwtToken : " + jwtToken);
+                log.info("Processing JWT token for path: {}", path);
                 //  토큰 만료 검사
                 if(jwtUtil.isTokenExpired(jwtToken)){
-                    log.info("token expire error");
+                    log.info("Token expired for path: {}", path);
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json; charset=UTF-8");
                     response.getWriter().write("{\"success\":false, \"message\":\"token expired\"}");
                     return;
                 }
                 userId = jwtUtil.validateAndExtractUserId(jwtToken);
-                log.info("userId : " + userId);
+                log.info("Validated userId: {} for path: {}", userId, path);
                 
             } catch (Exception e) {
-                log.error("Token validation error: ", e);  // 상세 에러 로깅 추가
+                log.error("Token validation error for path: " + path, e);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json; charset=UTF-8");
                 response.getWriter().write("{\"success\":false, \"message\":\"Invalid token: " + e.getMessage() + "\"}");
                 return;            
             }
         } else {
-            log.info("Authorization empty Bearer token empty ");
+            log.info("No Authorization header or Bearer token for path: {}", path);
         }
 
         //  사용자 ID가 존재하고 SecurityContext에 인증정보가 없는 경우 등록하기 위해서
@@ -91,9 +92,9 @@ public class JwtRequestFilter extends OncePerRequestFilter{
                 new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
                 // SecurityContext에 등록
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                log.info("JWT token ok");
+                log.info("Authentication successful for path: {}", path);
             }else{
-                log.info("JWT token error");
+                log.info("JWT token validation failed for path: {}", path);
             }
         
         }

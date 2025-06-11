@@ -1,5 +1,6 @@
 package com.ict.edu01.guestbook.service;
 
+import java.io.File;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,18 @@ public class GuestBookServiceImpl implements GuestBookService {
         
     }
 
+    @Override
+    public int guestbookwrite(GuestBookVO gVO) {
+        // 파일 업로드 처리
+        String fileName = gVO.getGb_f_name();
+        if(fileName != null && !fileName.isEmpty()) {
+            String uploadDir = "C:/upload/guestbook";
+            File uploadPath = new File(uploadDir);
+        }
+        return guestBookMapper.guestbookwrite(gVO);
+    }
 
+    
     
 
 
