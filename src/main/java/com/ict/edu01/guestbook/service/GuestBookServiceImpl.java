@@ -38,6 +38,18 @@ public class GuestBookServiceImpl implements GuestBookService {
         return guestBookMapper.guestbookwrite(gVO);
     }
 
+    @Override
+    public int guestbookdelete(String gb_idx) {
+        // 해당 방명록 데이터 삭제 처리
+        return guestBookMapper.guestbookdelete(gb_idx);
+    }
+
+    @Override
+    public int guestbookupdate(String gb_idx, GuestBookVO gVO) {
+        // 업데이트 처리
+        return guestBookMapper.guestbookupdate(gb_idx, gVO);
+    }
+
     
     
 

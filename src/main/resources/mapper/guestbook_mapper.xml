@@ -14,9 +14,17 @@
     </select>
 
     <insert id="guestbookwrite" parameterType="GuestBookVO">
-        INSERT INTO guestbook (gb_name, gb_email, gb_subject, gb_content,gb_f_name)
-        VALUES (#{gb_name}, #{gb_email}, #{gb_subject}, #{gb_content}, #{gb_f_name})
+        INSERT INTO guestbook (gb_name, gb_email, gb_subject, gb_content, gb_f_name, gb_regdate)
+        VALUES (#{gb_name}, #{gb_email}, #{gb_subject}, #{gb_content}, #{gb_f_name}, now())
     </insert>
    
+    <delete id="guestbookdelete" parameterType="String">
+        DELETE FROM guestbook WHERE gb_idx = #{gb_idx}
+    </delete>
+
+    <update id="guestbookupdate">
+        UPDATE guestbook SET gb_name = #{gVO.gb_name}, gb_email = #{gVO.gb_email}, gb_subject = #{gVO.gb_subject}, gb_content = #{gVO.gb_content}, gb_f_name = #{gVO.gb_f_name}, gb_regdate = now()
+        WHERE gb_idx = #{gb_idx}
+    </update>
 
 </mapper>

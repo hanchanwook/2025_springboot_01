@@ -80,9 +80,9 @@ public class GuestBookController {
 
     @PostMapping("/guestbookwrite")
     public DataVO guestBookWrite(
-            @RequestPart(value = "file", required = false) MultipartFile file,
-            @RequestPart("guestbook") GuestBookVO guestbook) {
+            @RequestPart(value = "file", required = false) MultipartFile file,@RequestPart("guestbook") GuestBookVO guestbook) {
         logger.info("Guestbook write request received");
+        logger.info("Guestbook: {}", guestbook);    
         DataVO dataVO = new DataVO();
         try {
             // 파일이 있는 경우 처리
@@ -111,6 +111,61 @@ public class GuestBookController {
         return dataVO;
     }
 
+    @PostMapping("/guestbookdelete")
+    public DataVO guestBookDelete(@RequestParam String gb_idx) {
+        logger.info("=== Guestbook Delete Request Details ===");
+        logger.info("Attempting to delete guestbook entry with ID: {}", gb_idx);
+        
+        DataVO dataVO = new DataVO();
+        try {
+            logger.info("Calling service layer for deletion");
+            int result = guestBookService.guestbookdelete(gb_idx);
+            
+            if (result > 0) {
+                logger.info("Guestbook deletion successful - ID: {}, Rows affected: {}", gb_idx, result);
+                dataVO.setSuccess(true);
+                dataVO.setMessage("방명록이 삭제되었습니다.");
+            } else {
+                logger.info("Guestbook deletion failed - ID: {}, No rows affected", gb_idx);
+                dataVO.setSuccess(false);
+                dataVO.setMessage("방명록 삭제에 실패했습니다.");
+            }
+        } catch (Exception e) {
+            logger.error("Error while deleting guestbook - ID: {}, Exception details:", gb_idx, e);
+            dataVO.setSuccess(false);
+            dataVO.setMessage("서버 오류: " + e.getMessage());
+        }
+        logger.info("=== End of Guestbook Delete Request ===");
+        return dataVO;
+    }
+
+    @PostMapping("/guestbookupdate")
+    public DataVO guestBookUpdate(@RequestPart("gb_idx") String gb_idx, @RequestPart("guestbook") GuestBookVO guestbook) {
+        logger.info("=== Guestbook Update Request Details ===");
+        logger.info("Attempting to update guestbook entry with ID: {}", gb_idx);        
+        System.out.println("gb_idx: " + gb_idx);
+        System.out.println("guestbook: " + guestbook);
+        DataVO dataVO = new DataVO();
+        try {
+            logger.info("Calling service layer for update");
+            int result = guestBookService.guestbookupdate(gb_idx, guestbook);
+            if (result > 0) {
+                logger.info("Guestbook update successful - ID: {}, Rows affected: {}", gb_idx, result);
+                dataVO.setSuccess(true);
+                dataVO.setMessage("방명록이 수정되었습니다.");
+            } else {
+                logger.info("Guestbook update failed - ID: {}, No rows affected", gb_idx);
+                dataVO.setSuccess(false);
+                dataVO.setMessage("방명록 수정에 실패했습니다.");
+            }
+        } catch (Exception e) {
+            logger.error("Error while updating guestbook - ID: {}, Exception details:", gb_idx, e);
+            dataVO.setSuccess(false);
+            dataVO.setMessage("서버 오류: " + e.getMessage());
+        }
+        logger.info("=== End of Guestbook Update Request ===");
+        return dataVO;
+    }
 
 
 }
