@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ict.edu01.guestbook.mapper.GuestBookMapper;
 import com.ict.edu01.guestbook.vo.GuestBookVO;
@@ -28,13 +29,25 @@ public class GuestBookServiceImpl implements GuestBookService {
     }
 
     @Override
-    public int guestbookwrite(GuestBookVO gVO) {
+    public int guestbookwrite(GuestBookVO gVO, MultipartFile file) {
         // 파일 업로드 처리
-        String fileName = gVO.getGb_f_name();
-        if(fileName != null && !fileName.isEmpty()) {
-            String uploadDir = "C:/upload/guestbook";
-            File uploadPath = new File(uploadDir);
+        if (file != null && !file.isEmpty()) {
+            String oldFileName = file.getOriginalFilename();
+            String uuid = java.util.UUID.randomUUID().toString();
+            String ext = org.springframework.util.StringUtils.getFilenameExtension(oldFileName);
+            String newFileName = uuid + (ext != null ? "." + ext : "");
+            String uploadPath = "C:/workspaces/springboot/edu01/upload/guestbook/";
+            java.nio.file.Path savePath = java.nio.file.Paths.get(uploadPath, newFileName);
+            try {
+                java.nio.file.Files.createDirectories(savePath.getParent());
+                file.transferTo(savePath.toFile());
+                gVO.setGb_f_name(newFileName);
+                gVO.setGb_old_f_name(oldFileName);
+            } catch (Exception e) {
+                throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
+            }
         }
+        
         return guestBookMapper.guestbookwrite(gVO);
     }
 
@@ -45,8 +58,24 @@ public class GuestBookServiceImpl implements GuestBookService {
     }
 
     @Override
-    public int guestbookupdate(String gb_idx, GuestBookVO gVO) {
+    public int guestbookupdate(String gb_idx, GuestBookVO gVO, MultipartFile file) {
         // 업데이트 처리
+        if(file != null && !file.isEmpty()) {
+            String oldFileName = file.getOriginalFilename();
+            String uuid = java.util.UUID.randomUUID().toString();
+            String ext = org.springframework.util.StringUtils.getFilenameExtension(oldFileName);
+            String newFileName = uuid + (ext != null ? "." + ext : "");
+            String uploadPath = "C:/workspaces/springboot/edu01/upload/guestbook/";
+            java.nio.file.Path savePath = java.nio.file.Paths.get(uploadPath, newFileName);
+            try {
+                java.nio.file.Files.createDirectories(savePath.getParent());
+                file.transferTo(savePath.toFile());
+                gVO.setGb_f_name(newFileName);
+                gVO.setGb_old_f_name(oldFileName);
+            } catch (Exception e) {
+                throw new RuntimeException("파일 업데이트 중 오류가 발생했습니다.", e);
+            }
+        } 
         return guestBookMapper.guestbookupdate(gb_idx, gVO);
     }
 

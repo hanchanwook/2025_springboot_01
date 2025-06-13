@@ -80,19 +80,16 @@ public class GuestBookController {
 
     @PostMapping("/guestbookwrite")
     public DataVO guestBookWrite(
-            @RequestPart(value = "file", required = false) MultipartFile file,@RequestPart("guestbook") GuestBookVO guestbook) {
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @RequestPart("guestbook") GuestBookVO guestbook) {
+
         logger.info("Guestbook write request received");
-        logger.info("Guestbook: {}", guestbook);    
+        logger.info("Guestbook: {}", guestbook);   
+        logger.info("File: {}", file);
+        
         DataVO dataVO = new DataVO();
         try {
-            // 파일이 있는 경우 처리
-            if (file != null && !file.isEmpty()) {
-                logger.info("File received: {}", file.getOriginalFilename());
-                // TODO: 파일 처리 로직 추가
-            }
-            
-            // 방명록 데이터 처리
-            int result = guestBookService.guestbookwrite(guestbook);
+            int result = guestBookService.guestbookwrite(guestbook, file);
             if (result > 0) {
                 logger.info("Guestbook write successful");
                 dataVO.setSuccess(true);
@@ -140,26 +137,25 @@ public class GuestBookController {
     }
 
     @PostMapping("/guestbookupdate")
-    public DataVO guestBookUpdate(@RequestPart("gb_idx") String gb_idx, @RequestPart("guestbook") GuestBookVO guestbook) {
+    public DataVO guestBookUpdate(@RequestPart("gb_idx") String gb_idx, @RequestPart("guestbook") GuestBookVO guestbook,
+    @RequestPart(value = "file", required = false) MultipartFile file) {
+
         logger.info("=== Guestbook Update Request Details ===");
-        logger.info("Attempting to update guestbook entry with ID: {}", gb_idx);        
-        System.out.println("gb_idx: " + gb_idx);
-        System.out.println("guestbook: " + guestbook);
+        logger.info("Attempting to update guestbook entry with ID: {}", gb_idx);
+        logger.info("File: {}", file);
+        
         DataVO dataVO = new DataVO();
         try {
-            logger.info("Calling service layer for update");
-            int result = guestBookService.guestbookupdate(gb_idx, guestbook);
+        
+            int result = guestBookService.guestbookupdate(gb_idx, guestbook, file);
             if (result > 0) {
-                logger.info("Guestbook update successful - ID: {}, Rows affected: {}", gb_idx, result);
                 dataVO.setSuccess(true);
                 dataVO.setMessage("방명록이 수정되었습니다.");
             } else {
-                logger.info("Guestbook update failed - ID: {}, No rows affected", gb_idx);
                 dataVO.setSuccess(false);
                 dataVO.setMessage("방명록 수정에 실패했습니다.");
             }
         } catch (Exception e) {
-            logger.error("Error while updating guestbook - ID: {}, Exception details:", gb_idx, e);
             dataVO.setSuccess(false);
             dataVO.setMessage("서버 오류: " + e.getMessage());
         }

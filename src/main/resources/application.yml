@@ -38,6 +38,10 @@ spring:
         password: 1111
         driver-class-name: com.mysql.cj.jdbc.Driver
 
+    web:
+        resources:
+            static-locations: file:C:/workspaces/springboot/edu01/upload/
+
     security:
         oauth2:
             client:

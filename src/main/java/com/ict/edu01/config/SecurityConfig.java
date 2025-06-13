@@ -61,6 +61,7 @@ public class SecurityConfig {
 
             // 요청별 권한 설정
             .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/upload/guestbook").permitAll()
                 .requestMatchers("/api/members/login").permitAll()     // 허용하는 url만 작성
                 .requestMatchers("/api/members/register").permitAll()   // 허용하는 url만 작성
                 .requestMatchers("/api/members/refresh").permitAll()   // 허용하는 url만 작성

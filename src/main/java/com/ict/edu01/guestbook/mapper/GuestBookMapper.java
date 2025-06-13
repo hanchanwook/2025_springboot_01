@@ -12,8 +12,8 @@ public interface GuestBookMapper {
     List<GuestBookVO> guestbooklist();    
     
     GuestBookVO guestbookdetail(String gb_idx);   
-    
-    int guestbookwrite(GuestBookVO gVO);
+    // 파일 업로드 처리 메서드    
+    int guestbookwrite(GuestBookVO gVO);    
 
     int guestbookdelete(String gb_idx);
 
