@@ -27,4 +27,12 @@
         WHERE gb_idx = #{gb_idx}
     </update>
 
+    <select id="getGuestBookImage" parameterType="String" resultType="String">
+        SELECT gb_f_name FROM guestbook WHERE gb_f_name = #{gb_f_name}
+    </select>
+
+    <select id="downloadGuestBookFile" parameterType="String" resultType="String">
+        SELECT gb_f_name FROM guestbook WHERE gb_f_name = #{gb_f_name}
+    </select>
+
 </mapper>

@@ -1,9 +1,12 @@
 package com.ict.edu01.guestbook.service;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,9 +54,9 @@ public class GuestBookServiceImpl implements GuestBookService {
         return guestBookMapper.guestbookwrite(gVO);
     }
 
+    // 해당 방명록 데이터 삭제 처리
     @Override
     public int guestbookdelete(String gb_idx) {
-        // 해당 방명록 데이터 삭제 처리
         return guestBookMapper.guestbookdelete(gb_idx);
     }
 
@@ -78,6 +81,38 @@ public class GuestBookServiceImpl implements GuestBookService {
         } 
         return guestBookMapper.guestbookupdate(gb_idx, gVO);
     }
+
+    // 이미지 미리보기용
+    @Override
+    public Resource getGuestBookImage(String gb_f_name) {
+        String uploadPath = "C:/workspaces/springboot/edu01/upload/guestbook/";
+        File file = new File(uploadPath + gb_f_name);
+        try {
+            if (file.exists() && file.isFile()) {
+                return new UrlResource(file.toURI());
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // 파일 다운로드용
+    @Override
+    public Resource downloadGuestBookFile(String gb_f_name) {
+        String uploadPath = "C:/workspaces/springboot/edu01/upload/guestbook/";
+        File file = new File(uploadPath + gb_f_name);
+        try {
+            if (file.exists() && file.isFile()) {
+                return new UrlResource(file.toURI());
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 
     
     

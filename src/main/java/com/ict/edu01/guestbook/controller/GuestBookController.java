@@ -1,8 +1,13 @@
 package com.ict.edu01.guestbook.controller;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.nio.file.Files;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
@@ -16,7 +21,10 @@ import com.ict.edu01.guestbook.vo.GuestBookVO;
 import com.ict.edu01.members.vo.DataVO;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.HttpHeaders;
+import org.springframework.core.io.Resource;
 
 @RestController
 @RequestMapping("/api/guestbook")
@@ -27,6 +35,7 @@ public class GuestBookController {
     @Autowired
     private GuestBookService guestBookService;
 
+    // 방명록 목록 불러오기
     @GetMapping("/guestbooklist")
     public DataVO searchBookName() {
         logger.info("Guestbook list request received");
@@ -51,7 +60,7 @@ public class GuestBookController {
         return dataVO;
     }
 
-    // 이름이 일치하면 생략 가능
+    // 방명록 상세 정보 불러오기
     @GetMapping("/guestbookdetail")
     public DataVO guestBookDetail(@RequestParam String gb_idx) {
         logger.info("Guestbook detail request received for id: {}", gb_idx);
@@ -78,6 +87,7 @@ public class GuestBookController {
         return dataVO;
     }
 
+    // 방명록 등록
     @PostMapping("/guestbookwrite")
     public DataVO guestBookWrite(
             @RequestPart(value = "file", required = false) MultipartFile file,
@@ -108,6 +118,7 @@ public class GuestBookController {
         return dataVO;
     }
 
+    // 방명록 삭제
     @PostMapping("/guestbookdelete")
     public DataVO guestBookDelete(@RequestParam String gb_idx) {
         logger.info("=== Guestbook Delete Request Details ===");
@@ -136,6 +147,7 @@ public class GuestBookController {
         return dataVO;
     }
 
+    // 방명록 업데이트
     @PostMapping("/guestbookupdate")
     public DataVO guestBookUpdate(@RequestPart("gb_idx") String gb_idx, @RequestPart("guestbook") GuestBookVO guestbook,
     @RequestPart(value = "file", required = false) MultipartFile file) {
@@ -163,5 +175,42 @@ public class GuestBookController {
         return dataVO;
     }
 
+    // 방명록 사진 미리보기
+    @GetMapping("guestbookimage/{gb_f_name}")
+    public ResponseEntity<UrlResource> guestBookImage(@PathVariable String gb_f_name) {
+        try {
+            Path filePath = Paths.get("C:/workspaces/springboot/edu01/upload/guestbook/", gb_f_name);
+            UrlResource resource = new UrlResource(filePath.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+            // Content-Type 자동 추론 (이미지면 image/jpeg 등으로 반환)
+            String filename = resource.getFilename();
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
+    // 방명록 사진 다운로드
+    @GetMapping("guestbookdownload/{gb_f_name}")
+    public ResponseEntity<Resource> guestBookDownload(@PathVariable String gb_f_name) {
+        try {
+            Path filePath = Paths.get("C:/workspaces/springboot/edu01/upload/guestbook/", gb_f_name);
+            UrlResource resource = new UrlResource(filePath.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+            String filename = resource.getFilename();
+            String contentType = Files.probeContentType(filePath);
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, contentType != null ? contentType : "application/octet-stream")
+                .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }
